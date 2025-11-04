@@ -1,4 +1,4 @@
-PROGRAM PengenalanArray;
+PROGRAM PengenalanArray1;
 USES Crt;
 
 VAR
