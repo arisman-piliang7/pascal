@@ -1,9 +1,23 @@
-if 5 <= jam < 12: # if luar
-    print("selamat pagi")
+program SapaNested;
+uses Crt;
+var
+    Jam: Integer;
+begin
+    ClrScr;
+    Write('Masukkan jam berapa sekarang (0-23): ');
+    ReadLn(Jam);
 
-    if jam < 10: # if dalam
-        print("jangan lupa sarapan")
-    else:
-        print("Bukan waktu sarapan")
-else:
-    print("jam tidak terdaftar") 
+    if (Jam >= 5) and (Jam < 12) then  { if luar }
+    begin
+        WriteLn('selamat pagi');
+
+        if (Jam < 10) then               { if dalam }
+            WriteLn('jangan lupa sarapan')
+        else
+            WriteLn('Bukan waktu sarapan');
+    end
+    else
+        WriteLn('jam tidak terdaftar');
+
+    ReadLn;
+end.

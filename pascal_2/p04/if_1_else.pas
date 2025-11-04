@@ -1,7 +1,7 @@
-program SapaPagiElse;
+program SapaPagiElse; //
 uses Crt;
 var
-  Jam: Integer;
+  Jam: Integer; 
 begin
   ClrScr;
   Write('Masukkan jam berapa sekarang (0-23): ');

@@ -23,7 +23,7 @@ var
   UMUR              : Integer; // Variabel bertipe angka bulat
   
   SUHU_BADAN,
-  BERAT_BADAN       : Real;    // Variabel bertipe angka desimal (float)
+  BERAT_BADAN       : Real;    // Variabel bertipe angka desimal (float) 
 
 // 3. Program Utama Dimulai
 begin
