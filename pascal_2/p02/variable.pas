@@ -1,7 +1,7 @@
 program PendaftaranPasien;
 
-uses
-  Crt; // Modul untuk Clear Screen (ClrScr)
+uses 
+Crt; // Modul untuk Clear Screen (ClrScr)
 
 // 1. Deklarasi Konstanta (data yang tidak berubah)
 const
@@ -17,8 +17,7 @@ var
   POLI,
   JENIS_LAYANAN,
   KELUHAN,
-  TANGGAL_KUNJUNG,
-  ADMIN             : String;  // Variabel bertipe teks
+  TANGGAL_KUNJUNG,ADMIN             : String;  // Variabel bertipe teks
   
   UMUR              : Integer; // Variabel bertipe angka bulat
   

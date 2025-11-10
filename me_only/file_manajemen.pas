@@ -1,5 +1,5 @@
 PROGRAM By_Mico_P;
-Uses Crt, Dos, Printer;
+Uses Crt; 
 
 TYPE
   Karyawan = RECORD
@@ -18,7 +18,7 @@ PROCEDURE BuatFileBaru;
 BEGIN
   ClrScr;
   {$I-}
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   Reset(F);
   IF IOResult <> 0 then ReWrite(F); { Membuat file baru }
   Seek(F, FileSize(F));
@@ -47,7 +47,7 @@ PROCEDURE LihatSemuaData;
 BEGIN
   ClrScr;
   {$I-}
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   Reset(F);
   IF IOResult <> 0 then
   BEGIN
@@ -78,7 +78,7 @@ VAR NomorCari: Byte;
 BEGIN
   ClrScr;
   {$I-}
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   Reset(F);
   IF IOResult <> 0 then
   BEGIN
@@ -91,11 +91,12 @@ BEGIN
   Write('Nomor akan dicari : '); Readln(NomorCari);
   WriteLn;
 
-  If (NomorCari > FileSize(F)) then
+  If (NomorCari > FileSize(F)) or (NomorCari < 1) then {Perbaikan kecil}
   BEGIN
     WriteLn('Nomor tsb tidak ada!');
     Write('Tekan Enter...');
     Readln;
+    Close(F); {Tutup file sebelum keluar}
     Exit;
   END;
 
@@ -120,7 +121,7 @@ VAR NamaCari:String[20];
 BEGIN
   ClrScr;
   {$I-}
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   Reset(F);
   IF IOResult <> 0 then
   BEGIN
@@ -144,6 +145,7 @@ BEGIN
       WriteLn('Umur   : ', Umur);
       WriteLn; Write('Tekan Enter untuk kembali ke menu...');
       Readln;
+      Close(F); {Tutup file sebelum keluar}
       Exit;
     END;
   END;
@@ -156,11 +158,11 @@ END;
 
 {*** MENGGANTI DATA LEWAT NOMOR ***}
 PROCEDURE GantiDataLewatNomor;
-VAR NomorGanti:Byte;
+VAR NomorGanti:Integer; {Byte hanya sampai 255, Integer lebih aman}
 BEGIN
   ClrScr;
   {$I-}
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   Reset(F);
   IF IOResult <> 0 then
   BEGIN
@@ -172,7 +174,11 @@ BEGIN
 
   Write('Nomor record akan diganti [0=Keluar]: ');
   Readln(NomorGanti);
-  If NomorGanti=0 then Exit;
+  If NomorGanti=0 then 
+  BEGIN
+    Close(F);
+    Exit;
+  END;
 
   If (NomorGanti<1) or (NomorGanti>FileSize(F)) then
   BEGIN
@@ -184,7 +190,6 @@ BEGIN
   END;
 
   With Pegawai do
-  {Pengulangan While Not EOF(F) di halaman 344 tidak diperlukan di sini karena Seek sudah spesifik}
   BEGIN
     Seek(F, NomorGanti-1);
     Read(F, Pegawai);
@@ -209,7 +214,6 @@ BEGIN
     Readln;
     Exit;
   END;
-  {Penambahan End setelah Exit (halaman 345) untuk menutup scope With dan Procedure}
 END;
 
 
@@ -220,7 +224,7 @@ VAR NamaGanti:String[20];
 BEGIN
   ClrScr;
   {$I-}
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   Reset(F);
   IF IOResult <> 0 then
   BEGIN
@@ -232,7 +236,11 @@ BEGIN
 
   Write('Nama akan diganti [ Enter = Keluar]: ');
   Readln(NamaGanti);
-  If NamaGanti = '' then Exit;
+  If NamaGanti = '' then 
+  BEGIN
+    Close(F);
+    Exit;
+  END;
   WriteLn;
 
   Nomor:=-1;
@@ -286,7 +294,7 @@ VAR
   Kar         : Char;
 BEGIN
   ClrScr;
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   {$I-} Reset(F); {$I+}
   If IOResult <> 0 then
   BEGIN
@@ -301,62 +309,74 @@ BEGIN
 
   With Pegawai do
   REPEAT
-    ClrScr;
     Write('Nomor record akan dihapus [0 = Keluar]? : ');
     Readln(NomorHapus);
-    If NomorHapus = 0 then Exit;
+    If NomorHapus = 0 then 
+    BEGIN
+        Close(F);
+        Exit;
+    END;
 
     If (NomorHapus < 1) or (NomorHapus > FileSize(F)) then
     BEGIN
       WriteLn('Nomor tersebut tidak ada!');
       Write('Tekan Enter...');
       Readln;
-      Close(F);
-      Exit;
+      {Jangan keluar, biarkan loop REPEAT mengulang}
+    END
+    ELSE
+    BEGIN
+      Seek(F, NomorHapus - 1);
+      Read(F, Pegawai);
+      WriteLn;
+      WriteLn('Nomor Record = ', NomorHapus);
+      WriteLn;
+      WriteLn('Nama   : ', Nama);
+      WriteLn('Alamat : ', Alamat);
+      WriteLn('Umur   : ', Umur);
+      WriteLn;
+
+      Write('Data inikah yang akan dihapus? [Y/T]: ');
+      Kar := UpCase(Readkey);
+      WriteLn;
+      IF Kar = 'Y' THEN Break; {Keluar dari loop jika ya}
     END;
+  UNTIL False; {Loop akan berhenti dengan Break}
 
-    Seek(F, NomorHapus - 1);
-    Read(F, Pegawai);
-    WriteLn;
-    WriteLn('Nomor Record = ', NomorHapus);
-    WriteLn;
-    WriteLn('Nama   : ', Nama);
-    WriteLn('Alamat : ', Alamat);
-    WriteLn('Umur   : ', Umur);
-    WriteLn;
-
-    Write('Data inikah yang akan dihapus? [Y/T]: ');
-    Kar := UpCase(Readkey);
-  UNTIL Kar='Y';
-
-  Assign(FileBaru, 'B:\TEMPORER.DAT');
-  {$I-} Reset(FileBaru); {$I+}
-  If IOResult <> 0 then ReWrite(FileBaru);
-
-  NomorRecord := -1; {Mengubah dari 0 ke -1 agar nomor record pertama adalah 0 saat Inc()}
+  Assign(FileBaru, 'TEMPORER.DAT'); {FIX 1: Mengganti path B:\}
+  {$I-} ReWrite(FileBaru); {$I+} {Selalu ReWrite file temporer}
+  
+  NomorRecord := -1; 
   Seek(F, 0);
 
   With Pegawai, Baru do
-  REPEAT
+  While not Eof(F) do {Ganti REPEAT UNTIL dengan WHILE NOT EOF}
+  BEGIN
     Read(F, Pegawai);
     Inc(NomorRecord);
-    If NomorRecord <> NomorHapus - 1 then {Perbaikan: Bandingkan dengan indeks record yang dihapus}
+    If NomorRecord <> (NomorHapus - 1) then 
     BEGIN
       NamaBaru   := Nama;
       AlamatBaru := Alamat;
       UmurBaru   := Umur;
       Write(FileBaru, Baru);
     END;
-  UNTIL Eof(F);
+  END;
 
   Close(F);
   Close(FileBaru);
+  
+  Assign(F, 'PEGAWAI.DAT'); {Assign ulang F}
   Erase(F);
-  Rename(FileBaru, 'B:\PEGAWAI.DAT');
+  
+  Assign(FileBaru, 'TEMPORER.DAT'); {Assign ulang FileBaru}
+  Rename(FileBaru, 'PEGAWAI.DAT'); {Ubah nama}
 END;
 
 
 {*** MENCETAK DATA KE PRINTER ***}
+{ FIX 4: Prosedur ini dinonaktifkan karena unit 'Printer' tidak kompatibel }
+{
 PROCEDURE CetakDataKePrinter;
 VAR NomorUrut:Integer;
 BEGIN
@@ -365,7 +385,7 @@ BEGIN
   WriteLn('Setelah selesai tekan Enter untuk mencetak...');
   Readln;
 
-  Assign(F, 'B:\PEGAWAI.DAT');
+  Assign(F, 'PEGAWAI.DAT'); {FIX 1: Mengganti path B:\}
   {$I-} Reset(F); {$I+}
   If IOResult <> 0 then
   BEGIN
@@ -380,24 +400,25 @@ BEGIN
   Write(Lst, #15, 'NO', 'NAMA':22, 'ALAMAT':30, 'UMUR':10);
   WriteLn(Lst); WriteLn(Lst);
 
-  NomorUrut:=-1; {Diubah dari 0 ke -1}
+  NomorUrut:= 0; {Lebih logis mulai dari 0}
   With Pegawai do
-  REPEAT
-    Inc(NomorUrut);
+  While Not EOF(F) do {Ganti REPEAT UNTIL dengan WHILE NOT EOF}
+  BEGIN
     Read(F, Pegawai);
-    WriteLn(Lst, #15, NomorUrut + 1, Nama:22, Alamat:30, Umur:10);
-  UNTIL EOF(F);
+    Inc(NomorUrut);
+    WriteLn(Lst, #15, NomorUrut, Nama:22, Alamat:30, Umur:10);
+  END;
 
   Close(F);
   WriteLn; Write('Tekan Enter untuk kembali ke menu...');
   Readln;
 END;
-
+}
 
 {*** MENGGANTI NAMA SEMBARANG FILE ***}
 PROCEDURE MenggantiNamaFile;
 VAR NamaFile, NamaBaru:String[79];
-    F:File;
+    F_Sembarang:File; {Ganti nama variabel F}
 BEGIN
   ClrScr;
   WriteLn('MENGGANTI NAMA FILE');
@@ -406,8 +427,8 @@ BEGIN
   Readln(NamaFile);
   If NamaFile='' then Exit;
 
-  Assign(F, NamaFile);
-  {$I-} Reset(F); {$I+}
+  Assign(F_Sembarang, NamaFile);
+  {$I-} Reset(F_Sembarang); {$I+}
   If IOResult <> 0 then
   BEGIN
     WriteLn;
@@ -422,8 +443,8 @@ BEGIN
   Write('Diganti menjadi (lengkap dengan drive): ');
   Readln(NamaBaru);
 
-  Close(F); { Tutup file terlebih dahulu }
-  {$I-} Rename(F, NamaBaru); {$I+}
+  Close(F_Sembarang); { Tutup file terlebih dahulu }
+  {$I-} Rename(F_Sembarang, NamaBaru); {$I+}
   IF IOResult = 0 then
   BEGIN
     WriteLn;
@@ -465,6 +486,7 @@ BEGIN
   WriteLn('DITEMUKAN!');
   Write('Yakin file ', NamaFile, ' akan dihapus [Y/T] ? ');
   Kar:=Upcase(Readkey);
+  WriteLn;
   If Kar='Y' then
   BEGIN
     Close(SembarangFile); { Tutup dahulu baru file tsb dihapus }
@@ -482,7 +504,8 @@ BEGIN
 END;
 
 
-{**** KURSOR **** }
+{**** KURSOR - DIHAPUS KARENA TIDAK KOMPATIBEL **** }
+{
 Procedure Kursor(AwalKursor,AkhirKursor:Byte);
 Var Reg: Registers;
 Begin
@@ -491,11 +514,12 @@ Begin
   Reg.CL := AkhirKursor;
   Intr($10, Reg);
 End;
+}
 
 {=== PROGRAM UTAMA ===}
 BEGIN
   Repeat
-    Kursor(7,0);
+    HideCursor; {FIX 2: Mengganti Kursor(7,0)}
     TextBackGround(0); Window(1,1,80,25); ClrScr;
 
     TextColor(15);
@@ -532,20 +556,20 @@ BEGIN
 
     Kar := Readkey;
     Case Kar of
-      #59 : Begin Kursor(0,7); BuatFileBaru; End;
-      #60 : LihatSemuaData; End;
-      #61 : Begin Kursor(0,7); CariDataLewatNomor; End;
-      #62 : Begin Kursor(0,7); CariDataLewatNama; End;
-      #63 : Begin Kursor(0,7); GantiDataLewatNomor; End;
-      #64 : Begin Kursor(0,7); GantiDataLewatNama; End;
-      #65 : Begin Kursor(0,7); HapusDataLewatNomor; End;
-      #66 : CetakDataKePrinter; End;
-      #67 : Begin Kursor(0,7); MenggantiNamaFile; End;
-      #68 : Begin Kursor(0,7); HapusFile; End;
+      #59 : Begin ShowCursor; BuatFileBaru; End; {FIX 2: Mengganti Kursor(0,7)}
+      #60 : LihatSemuaData; {FIX 3: Menghapus 'End;'}
+      #61 : Begin ShowCursor; CariDataLewatNomor; End; {FIX 2}
+      #62 : Begin ShowCursor; CariDataLewatNama; End; {FIX 2}
+      #63 : Begin ShowCursor; GantiDataLewatNomor; End; {FIX 2}
+      #64 : Begin ShowCursor; GantiDataLewatNama; End; {FIX 2}
+      #65 : Begin ShowCursor; HapusDataLewatNomor; End; {FIX 2}
+      { #66 : CetakDataKePrinter; } {FIX 4: Dinonaktifkan}
+      #67 : Begin ShowCursor; MenggantiNamaFile; End; {FIX 2}
+      #68 : Begin ShowCursor; HapusFile; End; {FIX 2}
       #27 : Begin
               TextBackGround(0); Textattr:=7;
               TextColor(7); Window(1,1,80,25);
-              ClrScr; Kursor(3,5); EXIT;
+              ClrScr; ShowCursor; EXIT; {FIX 2: Mengganti Kursor(3,5)}
             End;
     End; {End Case}
     Sound(140); Delay(30);

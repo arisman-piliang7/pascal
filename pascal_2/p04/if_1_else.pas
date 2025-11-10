@@ -15,4 +15,3 @@ begin
     WriteLn('bukan waktu pagi'); // <-- ; baru diletakkan di akhir
   
   ReadLn;
-end.
