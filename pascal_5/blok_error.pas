@@ -9,9 +9,8 @@ var
 begin
   clrscr;
   
-  inputOK := false; // sign first that input notyet valid
+  inputOK := false; // sign first that if input notyet valid
   
-
   repeat //like while true in py, it will keep repeating until true
     try
       Write('Silakan masukkan umur Anda: ');
@@ -31,7 +30,7 @@ begin
       end;
     end;
     
-  until inputOK; // out from loop f only inputOK = true
+  until inputOK; // out from loop if only inputOK = true
 
   Writeln('Terima kasih. Umur Anda adalah ', umur, ' tahun.');
   Readln;
