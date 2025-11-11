@@ -26,7 +26,7 @@ begin
   writeln;
   writeln('Data yang telah dimasukkan:');
   for i := 1 to n do
-    write(arr[i]:3); //3 adalah lebar tampilan untuk setiap elemen
+    write(arr[i]:6); //3 adalah lebar tampilan untuk setiap elemen
 
   writeln;
   write('Tekan Enter untuk keluar...');

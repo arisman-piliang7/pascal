@@ -5,7 +5,7 @@ const
   MAXC = 50;
 
 var
-  arr: array[1..MAXR, 1..MAXC] of integer;
+  arr: array[1.., 1..MAXC] of integer;
   r, c, i, j: integer;
 
 begin

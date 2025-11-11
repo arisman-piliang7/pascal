@@ -29,6 +29,6 @@ begin
     WriteLn('jam tidak valid'); // Ini jika semua pemeriksaan di atas salah
   
   // (Opsional) tambahkan ReadLn di sini jika jendela konsol
-  // Anda langsung tertutup setelah program selesai.
-  // ReadLn; 
+  // langsung tertutup setelah program selesai.
+   ReadLn; 
 end.

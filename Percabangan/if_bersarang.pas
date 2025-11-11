@@ -35,5 +35,5 @@ begin
   // -- Akhir dari IF Pertama --
 
   // (Opsional) tambahkan ReadLn di sini
-  // ReadLn; 
+  ReadLn;
 end.
