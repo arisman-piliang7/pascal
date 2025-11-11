@@ -9,24 +9,25 @@ var
 begin
   clrscr;
   
-  inputOK := false; // Set 'false' to start the loop
+  inputOK := false; // sign first that input notyet valid
   
 
-  repeat //like while true in py, it will keep repeating until break
+  repeat //like while true in py, it will keep repeating until true
     try
       Write('Silakan masukkan umur Anda: ');
       Readln(umur);
 
       // if Readln(umur) success, program will continue here
-      inputOK := true; // Set 'true' to exit loop
+      inputOK := true; // if input true exit from loop like a break statement
       
+    //error handling here
     except //capture the error
-      on EInOutError do // Menangkap error JIKA user mengetik 'abc'
+      on EInOutError do //error notif casual is EInOutError
       begin
         Writeln;
         Writeln('ERROR: Input tidak valid. Harap masukkan ANGKA saja.');
         Writeln;
-        inputOK := false; //ini gunanya agar loop diulang lagi
+        inputOK := false; //output false to repeat the loop
       end;
     end;
     
